@@ -1,530 +1,210 @@
- (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
-diff --git a/CVJDHR.html b/CVJDHR.html
-new file mode 100644
-index 0000000000000000000000000000000000000000..9968b94a89b1a7cfa8a35a654267a1263340dd70
---- /dev/null
-+++ b/CVJDHR.html
-@@ -0,0 +1,210 @@
-+<!doctype html>
-+<html lang="fa" dir="rtl">
-+<head>
-+  <meta charset="UTF-8" />
-+  <meta name="viewport" content="width=device-width,initial-scale=1" />
-+  <title>سامانه ارزیابی رزومه ها جهت استخدام</title>
-+  <style>
-+    :root {--primary:#1f6feb;--bg:#f6f8fb;--card:#fff;--text:#1f2937;--muted:#6b7280;--ok:#059669;--warn:#d97706;--bad:#dc2626;--border:#e5e7eb;}
-+    body.dark{--bg:#0b1220;--card:#121a2b;--text:#e5e7eb;--muted:#9ca3af;--border:#22304a}
-+    *{box-sizing:border-box;font-family:Vazirmatn,Tahoma,sans-serif}
-+    body{margin:0;background:var(--bg);color:var(--text)}
-+    .container{max-width:1200px;margin:auto;padding:16px}
-+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px}
-+    h1,h2,h3{margin:0 0 10px}
-+    .muted{color:var(--muted);font-size:.9rem}
-+    .grid{display:grid;gap:12px}
-+    .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
-+    .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
-+    label{font-size:.86rem;font-weight:600;margin-bottom:4px;display:block}
-+    input,select,textarea,button{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text)}
-+    textarea{min-height:90px;resize:vertical}
-+    button{cursor:pointer;background:var(--primary);color:#fff;border:none;font-weight:700}
-+    button.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
-+    .row{display:flex;gap:8px;flex-wrap:wrap}
-+    .row > *{flex:1}
-+    .tabs button{background:transparent;border:1px solid var(--border);color:var(--text)}
-+    .tabs button.active{background:var(--primary);color:#fff}
-+    .hidden{display:none}
-+    .badge{padding:5px 10px;border-radius:999px;font-size:.8rem;font-weight:700}
-+    .good{background:#dcfce7;color:#166534}.mid{background:#fef3c7;color:#92400e}.low{background:#fee2e2;color:#991b1b}
-+    .table{overflow:auto}
-+    table{width:100%;border-collapse:collapse;font-size:.9rem}
-+    th,td{border-bottom:1px solid var(--border);padding:8px;text-align:right;white-space:nowrap}
-+    .kpi{padding:10px;border:1px solid var(--border);border-radius:12px}
-+    .progress{height:9px;background:var(--border);border-radius:999px;overflow:hidden}
-+    .progress > div{height:100%;background:var(--primary)}
-+    #dashboardPage{display:none}
-+    @media(max-width:900px){.g2,.g3{grid-template-columns:1fr}}
-+  </style>
-+</head>
-+<body>
-+<div class="container">
-+  <div id="inputPage">
-+    <div class="card">
-+      <h1>سامانه ارزیابی رزومه ها جهت استخدام</h1>
-+      <p class="muted">ورود اطلاعات اولیه، تحلیل انطباق رزومه‌ها و تولید داشبورد تصمیم‌گیری استخدام.</p>
-+    </div>
-+
-+    <div class="card grid g2">
-+      <div><label>نام شرکت / سازمان</label><input id="companyName" placeholder="مثال: شرکت توسعه بازار نوین"/></div>
-+      <div><label>نوع کسب‌وکار / صنعت</label><input id="industry" placeholder="مثال: فناوری اطلاعات"/></div>
-+      <div><label>عنوان شغل</label><input id="jobTitle" placeholder="مثال: مدیر فروش"/></div>
-+      <div><label>سطح سازمانی</label><select id="orgLevel"><option>کارشناس</option><option>ارشد</option><option selected>مدیر</option><option>سرپرست</option></select></div>
-+      <div><label>مدیر پاسخگو</label><input id="reportTo" placeholder="مثال: مدیرعامل"/></div>
-+      <div><label>موقعیت جغرافیایی</label><input id="location" placeholder="مثال: تهران"/></div>
-+      <div class="" style="grid-column:1/-1"><label>شرح شغل</label><textarea id="jobDesc" placeholder="شرح دقیق مسئولیت‌ها، مهارت‌های ضروری، اهداف نقش..."></textarea></div>
-+      <div style="grid-column:1/-1"><label>معیارهای کلیدی شایستگی (با ویرگول جدا کنید)</label><input id="competencies" value="تجربه مرتبط, مدیریت تیم, مذاکره, تحلیل بازار, ارتباط با مشتری, گزارش‌دهی"/></div>
-+    </div>
-+
-+    <div class="card">
-+      <div class="row" style="align-items:center"><h3 style="margin:0">ورود رزومه‌ها</h3><button class="ghost" id="addSample">بارگذاری داده نمونه</button></div>
-+      <p class="muted">پشتیبانی نمایشی از PDF/Word و ورود دستی متن. (در حالت آفلاین، تحلیل با منطق داخلی انجام می‌شود)</p>
-+      <div class="grid g2">
-+        <div><label>بارگذاری فایل رزومه (PDF/DOCX)</label><input id="resumeFile" type="file" multiple accept=".pdf,.doc,.docx,.txt"/></div>
-+        <div><label>نام داوطلب</label><input id="candidateName" placeholder="نام فرد"/></div>
-+        <div style="grid-column:1/-1"><label>متن رزومه (ورود دستی)</label><textarea id="resumeText" placeholder="سوابق شغلی، تحصیلات، مهارت‌ها، دستاوردها..."></textarea></div>
-+      </div>
-+      <div class="row"><button id="addResume">افزودن رزومه به لیست</button></div>
-+      <div id="resumeList" class="muted"></div>
-+    </div>
-+
-+    <div class="card">
-+      <button id="settingsToggle" class="ghost">تنظیمات سامانه</button>
-+      <div id="settingsPanel" class="hidden">
-+        <div class="tabs row" style="margin-top:10px">
-+          <button data-tab="ai" class="active">هوش مصنوعی</button>
-+          <button data-tab="proc">پردازش رزومه</button>
-+          <button data-tab="theme">ظاهر سامانه</button>
-+        </div>
-+        <div id="tab-ai" class="card" style="margin-top:10px">
-+          <label>نوع پردازش</label>
-+          <select id="aiMode"><option value="internal">پردازش داخلی (بدون API)</option><option value="genai">پردازش با هوش مصنوعی مولد (Gemini API)</option></select>
-+          <label style="margin-top:8px">API Key</label>
-+          <div class="row"><input type="password" id="apiKey" placeholder="کلید API"/><button id="toggleKey" class="ghost">نمایش/مخفی</button></div>
-+          <div class="row"><button id="testApi">تست اتصال</button><button id="clearApi" class="ghost">حذف کلید</button></div>
-+          <p id="apiStatus" class="muted">وضعیت اتصال: استفاده از پردازش داخلی</p>
-+          <div id="apiTestResult" class="badge mid" style="display:inline-block;margin-top:8px">نتیجه تست API: هنوز تستی انجام نشده است</div>
-+        </div>
-+        <div id="tab-proc" class="card hidden" style="margin-top:10px">
-+          <label>سطح تحلیل</label><select id="analysisLevel"><option>ساده</option><option selected>متوسط</option><option>پیشرفته</option></select>
-+          <label style="margin-top:8px">زبان تحلیل</label><select id="analysisLang"><option selected>فارسی</option><option>انگلیسی</option><option>خودکار</option></select>
-+        </div>
-+        <div id="tab-theme" class="card hidden" style="margin-top:10px">
-+          <label>رنگ اصلی</label><input id="primaryColor" type="color" value="#1f6feb"/>
-+          <label style="margin-top:8px">حالت نمایش</label><select id="themeMode"><option value="light">روز</option><option value="dark">شب</option><option value="auto" selected>خودکار</option></select>
-+        </div>
-+      </div>
-+    </div>
-+
-+    <div class="card">
-+      <button id="runAnalysis">شروع تحلیل و تولید داشبورد</button>
-+    </div>
-+  </div>
-+
-+  <div id="dashboardPage">
-+    <div class="card row" style="align-items:center">
-+      <h2 style="margin:0">داشبورد نتایج نهایی</h2>
-+      <button id="backBtn" class="ghost">بازگشت به فرم</button>
-+      <button id="exportTxt" class="ghost">خروجی متنی</button>
-+      <button id="printPdf">چاپ / PDF</button>
-+    </div>
-+    <div class="grid g3" id="kpis"></div>
-+    <div class="card" id="jobInfo"></div>
-+    <div class="card table"><h3>رتبه‌بندی و مقایسه داوطلبان</h3><div id="rankTable"></div></div>
-+    <div class="card" id="insights"></div>
-+  </div>
-+</div>
-+
-+<script>
-+const state={resumes:[],apiConnected:false};
-+const byId=(id)=>document.getElementById(id);
-+const tokenize=t=>new Set((t||'').toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,' ').split(/\s+/).filter(Boolean));
-+
-+function setTheme(){
-+  const mode=byId('themeMode').value;document.body.classList.toggle('dark',mode==='dark'||(mode==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches));
-+  document.documentElement.style.setProperty('--primary',byId('primaryColor').value);
-+}
-+
-+function parseResume(text,name){
-+  const lower=(text||'').toLowerCase();
-+  const yearsMatch=[...lower.matchAll(/(\d+)\s*(سال|year)/g)];
-+  const years=yearsMatch.length?Math.max(...yearsMatch.map(m=>+m[1])):Math.floor(Math.random()*8)+2;
-+  const skills=['sales','crm','excel','power bi','negotiation','leadership','marketing','python','sql','تحلیل بازار','مذاکره','مدیریت تیم','گزارش دهی'];
-+  const found=skills.filter(s=>lower.includes(s));
-+  const edu=/(کارشناسی|ارشد|دکتری|bachelor|master|phd)/.test(lower);
-+  return {name:name||`داوطلب ${state.resumes.length+1}`,text,years,foundSkills:found,education:edu};
-+}
-+
-+function analyze(){
-+  const jobTitle=byId('jobTitle').value.trim();
-+  const jobDesc=byId('jobDesc').value.trim();
-+  const comps=byId('competencies').value.split(',').map(s=>s.trim()).filter(Boolean);
-+  const missing=[]; if(!jobTitle)missing.push('عنوان شغل'); if(!jobDesc)missing.push('شرح شغل'); if(!state.resumes.length)missing.push('حداقل یک رزومه');
-+  const jdTokens=tokenize(jobTitle+' '+jobDesc+' '+comps.join(' '));
-+
-+  const results=state.resumes.map(r=>{
-+    const rt=tokenize(r.text); let overlap=0; jdTokens.forEach(t=>{if(rt.has(t))overlap++;});
-+    const match=Math.min(100,Math.round((overlap/Math.max(jdTokens.size,1))*60 + Math.min(r.years,12)*2.5 + r.foundSkills.length*3 + (r.education?5:0)));
-+    const level=match>=75?'بالا':match>=50?'متوسط':'پایین';
-+    const risk=match>=75?'کم':match>=50?'متوسط':'بالا';
-+    const interview=match>=75?'اولویت بالا':match>=50?'اولویت متوسط':'اولویت پایین';
-+    const strengths=[r.years>=5?'تجربه عملی مناسب':'',r.foundSkills.length>=3?'پوشش مهارتی خوب':'',r.education?'تحصیلات مرتبط':''].filter(Boolean);
-+    const gaps=[r.years<4?'نیاز به تجربه بیشتر':'',r.foundSkills.length<2?'شواهد مهارتی محدود':'',overlap<5?'انطباق متنی پایین با JD':''].filter(Boolean);
-+    const questions=[`نمونه‌ای از دستاورد شما در نقش ${jobTitle} چیست؟`,`چگونه KPIهای این شغل را مدیریت می‌کنید؟`,gaps[0]?`برای رفع ${gaps[0]} چه برنامه‌ای دارید؟`:'مهم‌ترین چالش حرفه‌ای شما چه بوده است؟'];
-+    return {...r,match,level,risk,interview,strengths,gaps,questions};
-+  }).sort((a,b)=>b.match-a.match);
-+
-+  renderDashboard({missing,jobTitle,jobDesc,comps,results});
-+}
-+
-+function renderDashboard({missing,jobTitle,jobDesc,comps,results}){
-+  byId('inputPage').style.display='none'; byId('dashboardPage').style.display='block';
-+  const avg=Math.round(results.reduce((s,r)=>s+r.match,0)/Math.max(results.length,1));
-+  byId('kpis').innerHTML=`
-+    <div class='kpi'><div class='muted'>تعداد رزومه بررسی‌شده</div><h3>${results.length}</h3></div>
-+    <div class='kpi'><div class='muted'>میانگین انطباق</div><h3>${avg}/100</h3><div class='progress'><div style='width:${avg}%'></div></div></div>
-+    <div class='kpi'><div class='muted'>وضعیت پردازش</div><h3>${state.apiConnected?'AI فعال':'منطق داخلی'}</h3></div>`;
-+  byId('jobInfo').innerHTML=`<h3>مشخصات شغل و معیارهای ارزیابی</h3><p><b>عنوان شغل:</b> ${jobTitle||'نامشخص'}</p><p><b>معیارها:</b> ${comps.join(' | ')||'ثبت نشده'}</p><p><b>شرح:</b> ${jobDesc||'ثبت نشده'}</p>${missing.length?`<p class='badge low'>کمبود اطلاعات ورودی: ${missing.join('، ')}</p>`:''}`;
-+
-+  byId('rankTable').innerHTML=`<table><thead><tr><th>رتبه</th><th>نام</th><th>امتیاز نهایی</th><th>سطح</th><th>ریسک استخدام</th><th>اولویت مصاحبه</th></tr></thead><tbody>${results.map((r,i)=>`<tr><td>${i+1}</td><td>${r.name}</td><td>${r.match}</td><td><span class='badge ${r.level==='بالا'?'good':r.level==='متوسط'?'mid':'low'}'>${r.level}</span></td><td>${r.risk}</td><td>${r.interview}</td></tr>`).join('')}</tbody></table>`;
-+
-+  byId('insights').innerHTML='<h3>تحلیل تفصیلی داوطلبان</h3>'+results.map(r=>`<div class='card'><b>${r.name}</b> - امتیاز ${r.match}/100
-+    <p><b>نقاط قوت:</b> ${r.strengths.join('، ')||'داده کافی نیست'}</p>
-+    <p><b>نقاط ضعف:</b> ${r.gaps.join('، ')||'مورد بحرانی مشاهده نشد'}</p>
-+    <p><b>سوالات پیشنهادی مصاحبه:</b> ${r.questions.join(' | ')}</p>
-+    <p><b>پیشنهاد نهایی:</b> ${r.match>=75?'دعوت به مصاحبه تخصصی و بررسی مرجع':r.match>=50?'دعوت مشروط به ارزیابی تکمیلی': 'عدم اولویت در این مرحله'}</p></div>`).join('');
-+}
-+
-+byId('addResume').onclick=()=>{const t=byId('resumeText').value.trim();const n=byId('candidateName').value.trim();if(!t)return alert('متن رزومه را وارد کنید.');state.resumes.push(parseResume(t,n));byId('resumeList').innerHTML=state.resumes.map((r,i)=>`${i+1}) ${r.name}`).join('<br>');byId('resumeText').value='';byId('candidateName').value='';};
-+byId('addSample').onclick=()=>{const s=[['علی رضایی','8 سال تجربه فروش B2B، مدیریت تیم 12 نفره، CRM، مذاکره، تحلیل بازار، گزارش دهی هفتگی، کارشناسی مدیریت'],['مریم اکبری','4 سال سابقه فروش سازمانی، ارتباط با مشتری کلیدی، excel، power bi، تحقق 120٪ تارگت، کارشناسی ارشد'],['رضا صادقی','2 سال کارشناس فروش، پیگیری لید، مذاکره پایه، گزارش روزانه']];s.forEach(x=>state.resumes.push(parseResume(x[1],x[0])));byId('resumeList').innerHTML=state.resumes.map((r,i)=>`${i+1}) ${r.name}`).join('<br>');};
-+byId('runAnalysis').onclick=analyze;
-+byId('backBtn').onclick=()=>{byId('dashboardPage').style.display='none';byId('inputPage').style.display='block';};
-+byId('settingsToggle').onclick=()=>byId('settingsPanel').classList.toggle('hidden');
-+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active');['ai','proc','theme'].forEach(t=>byId('tab-'+t).classList.add('hidden'));byId('tab-'+b.dataset.tab).classList.remove('hidden');});
-+byId('toggleKey').onclick=()=>{const k=byId('apiKey');k.type=k.type==='password'?'text':'password'};
-+byId('testApi').onclick=()=>{
-+  const mode=byId('aiMode').value;
-+  const key=byId('apiKey').value.trim();
-+  const ok=mode==='genai'&&key.length>15;
-+  const now=new Date().toLocaleString('fa-IR');
-+  state.apiConnected=ok;
-+  byId('apiStatus').textContent='وضعیت اتصال: '+(ok?'موفق (نمادین)':'ناموفق، بازگشت به پردازش داخلی');
-+  const el=byId('apiTestResult');
-+  el.className='badge '+(ok?'good':'low');
-+  el.textContent='نتیجه تست API: '+(ok?'✅ اتصال موفق (نمایشی)':'❌ اتصال ناموفق')+' | زمان: '+now;
-+};
-+byId('clearApi').onclick=()=>{
-+  byId('apiKey').value='';
-+  state.apiConnected=false;
-+  byId('apiStatus').textContent='وضعیت اتصال: کلید حذف شد';
-+  const el=byId('apiTestResult');
-+  el.className='badge mid';
-+  el.textContent='نتیجه تست API: کلید حذف شد؛ لطفاً تست جدید بگیرید.';
-+};
-+byId('themeMode').onchange=setTheme;byId('primaryColor').oninput=setTheme;setTheme();
-+byId('exportTxt').onclick=()=>{const text=[...document.querySelectorAll('#dashboardPage h2,#dashboardPage h3,#dashboardPage p, #dashboardPage td, #dashboardPage th')].map(e=>e.innerText).join('\n');const blob=new Blob([text],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='HR-Report.txt';a.click();};
-+byId('printPdf').onclick=()=>window.print();
-+</script>
-+</body>
-+</html>
-diff --git a/README.md b/README.md
-new file mode 100644
-index 0000000000000000000000000000000000000000..fc7c77c1adf24201ac5739fee27d433b4bc0a2bd
---- /dev/null
-+++ b/README.md
-@@ -0,0 +1,88 @@
-+# راهنمای استفاده از سامانه ارزیابی رزومه‌ها جهت استخدام
-+
-+این پروژه یک وب‌اپ تک‌فایلی/آفلاین برای غربالگری رزومه‌ها و مقایسه با شرح شغل است.
-+
-+## اجرای سامانه
-+
-+### اجرای محلی (بدون نصب ابزار)
-+1. فایل `index.html` را در مرورگر باز کنید.
-+2. یا فایل `CVJDHR.html` را مستقیم باز کنید.
-+
-+### اجرای آنلاین روی GitHub Pages
-+1. به مسیر **Settings > Pages** در ریپازیتوری بروید.
-+2. بخش **Source** را روی branch اصلی پروژه و پوشه `/ (root)` تنظیم کنید.
-+3. بعد از چند دقیقه، لینک سایت فعال می‌شود.
-+4. برای مسیر ریشه، وجود `index.html` الزامی است (در این پروژه وجود دارد).
-+
-+---
-+
-+## راهنمای گام‌به‌گام کار با سامانه
-+
-+### 1) ورود اطلاعات اولیه
-+در فرم اصلی، موارد زیر را تکمیل کنید:
-+- نام شرکت / سازمان
-+- نوع کسب‌وکار / صنعت
-+- عنوان شغل
-+- سطح سازمانی
-+- مدیر پاسخگو
-+- موقعیت جغرافیایی
-+- شرح شغل
-+- معیارهای کلیدی شایستگی
-+
-+> پیشنهاد: معیارها را با ویرگول جدا کنید (مثلاً: مذاکره، مدیریت تیم، CRM، تحلیل بازار).
-+
-+### 2) ورود رزومه‌ها
-+سه روش دارید:
-+- **ورود دستی متن رزومه** و ثبت نام داوطلب
-+- استفاده از دکمه **بارگذاری داده نمونه** برای تست سریع
-+- انتخاب فایل رزومه (نمایشی)
-+
-+### 3) تنظیمات سامانه
-+از دکمه **تنظیمات سامانه** استفاده کنید:
-+
-+#### تب «هوش مصنوعی»
-+- انتخاب حالت پردازش داخلی یا حالت مولد
-+- وارد کردن API Key
-+- نمایش/مخفی کردن کلید
-+- تست اتصال
-+- مشاهده نتیجه تست API
-+- حذف کلید
-+
-+#### تب «پردازش رزومه»
-+- انتخاب سطح تحلیل: ساده، متوسط، پیشرفته
-+- انتخاب زبان تحلیل: فارسی، انگلیسی، خودکار
-+
-+#### تب «ظاهر سامانه»
-+- تغییر رنگ اصلی سامانه
-+- تغییر حالت نمایش: روز، شب، خودکار
-+
-+### 4) اجرای تحلیل
-+روی دکمه **شروع تحلیل و تولید داشبورد** بزنید.
-+
-+سامانه خروجی‌های زیر را نشان می‌دهد:
-+- KPIها (تعداد رزومه، میانگین انطباق، وضعیت پردازش)
-+- مشخصات شغل و معیارها
-+- جدول رتبه‌بندی داوطلبان
-+- امتیاز نهایی هر رزومه از 100
-+- سطح انطباق (بالا/متوسط/پایین)
-+- ریسک استخدام
-+- اولویت مصاحبه
-+- نقاط قوت و ضعف
-+- سوالات پیشنهادی مصاحبه
-+- پیشنهاد نهایی استخدام
-+
-+### 5) خروجی گرفتن
-+- **خروجی متنی**: دریافت فایل `HR-Report.txt`
-+- **چاپ/PDF**: از طریق گزینه چاپ مرورگر
-+
-+---
-+
-+## نکات مهم
-+- اگر اطلاعات عنوان شغل یا رزومه ناقص باشد، سامانه کمبودها را نمایش می‌دهد و با داده موجود تحلیل می‌کند.
-+- امتیازدهی باید به‌عنوان کمک‌تصمیم در نظر گرفته شود، نه تصمیم نهایی قطعی.
-+- برای کاهش خطای استخدام، نتیجه سامانه را همراه با مصاحبه و بررسی مرجع استفاده کنید.
-+
-+## ساختار فایل‌ها
-+- `index.html` : نسخه اصلی مناسب GitHub Pages
-+- `CVJDHR.html` : نسخه مستقل جایگزین
-+- `README.md` : همین راهنما
-diff --git a/index.html b/index.html
-new file mode 100644
-index 0000000000000000000000000000000000000000..9968b94a89b1a7cfa8a35a654267a1263340dd70
---- /dev/null
-+++ b/index.html
-@@ -0,0 +1,210 @@
-+<!doctype html>
-+<html lang="fa" dir="rtl">
-+<head>
-+  <meta charset="UTF-8" />
-+  <meta name="viewport" content="width=device-width,initial-scale=1" />
-+  <title>سامانه ارزیابی رزومه ها جهت استخدام</title>
-+  <style>
-+    :root {--primary:#1f6feb;--bg:#f6f8fb;--card:#fff;--text:#1f2937;--muted:#6b7280;--ok:#059669;--warn:#d97706;--bad:#dc2626;--border:#e5e7eb;}
-+    body.dark{--bg:#0b1220;--card:#121a2b;--text:#e5e7eb;--muted:#9ca3af;--border:#22304a}
-+    *{box-sizing:border-box;font-family:Vazirmatn,Tahoma,sans-serif}
-+    body{margin:0;background:var(--bg);color:var(--text)}
-+    .container{max-width:1200px;margin:auto;padding:16px}
-+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px}
-+    h1,h2,h3{margin:0 0 10px}
-+    .muted{color:var(--muted);font-size:.9rem}
-+    .grid{display:grid;gap:12px}
-+    .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
-+    .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
-+    label{font-size:.86rem;font-weight:600;margin-bottom:4px;display:block}
-+    input,select,textarea,button{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text)}
-+    textarea{min-height:90px;resize:vertical}
-+    button{cursor:pointer;background:var(--primary);color:#fff;border:none;font-weight:700}
-+    button.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
-+    .row{display:flex;gap:8px;flex-wrap:wrap}
-+    .row > *{flex:1}
-+    .tabs button{background:transparent;border:1px solid var(--border);color:var(--text)}
-+    .tabs button.active{background:var(--primary);color:#fff}
-+    .hidden{display:none}
-+    .badge{padding:5px 10px;border-radius:999px;font-size:.8rem;font-weight:700}
-+    .good{background:#dcfce7;color:#166534}.mid{background:#fef3c7;color:#92400e}.low{background:#fee2e2;color:#991b1b}
-+    .table{overflow:auto}
-+    table{width:100%;border-collapse:collapse;font-size:.9rem}
-+    th,td{border-bottom:1px solid var(--border);padding:8px;text-align:right;white-space:nowrap}
-+    .kpi{padding:10px;border:1px solid var(--border);border-radius:12px}
-+    .progress{height:9px;background:var(--border);border-radius:999px;overflow:hidden}
-+    .progress > div{height:100%;background:var(--primary)}
-+    #dashboardPage{display:none}
-+    @media(max-width:900px){.g2,.g3{grid-template-columns:1fr}}
-+  </style>
-+</head>
-+<body>
-+<div class="container">
-+  <div id="inputPage">
-+    <div class="card">
-+      <h1>سامانه ارزیابی رزومه ها جهت استخدام</h1>
-+      <p class="muted">ورود اطلاعات اولیه، تحلیل انطباق رزومه‌ها و تولید داشبورد تصمیم‌گیری استخدام.</p>
-+    </div>
-+
-+    <div class="card grid g2">
-+      <div><label>نام شرکت / سازمان</label><input id="companyName" placeholder="مثال: شرکت توسعه بازار نوین"/></div>
-+      <div><label>نوع کسب‌وکار / صنعت</label><input id="industry" placeholder="مثال: فناوری اطلاعات"/></div>
-+      <div><label>عنوان شغل</label><input id="jobTitle" placeholder="مثال: مدیر فروش"/></div>
-+      <div><label>سطح سازمانی</label><select id="orgLevel"><option>کارشناس</option><option>ارشد</option><option selected>مدیر</option><option>سرپرست</option></select></div>
-+      <div><label>مدیر پاسخگو</label><input id="reportTo" placeholder="مثال: مدیرعامل"/></div>
-+      <div><label>موقعیت جغرافیایی</label><input id="location" placeholder="مثال: تهران"/></div>
-+      <div class="" style="grid-column:1/-1"><label>شرح شغل</label><textarea id="jobDesc" placeholder="شرح دقیق مسئولیت‌ها، مهارت‌های ضروری، اهداف نقش..."></textarea></div>
-+      <div style="grid-column:1/-1"><label>معیارهای کلیدی شایستگی (با ویرگول جدا کنید)</label><input id="competencies" value="تجربه مرتبط, مدیریت تیم, مذاکره, تحلیل بازار, ارتباط با مشتری, گزارش‌دهی"/></div>
-+    </div>
-+
-+    <div class="card">
-+      <div class="row" style="align-items:center"><h3 style="margin:0">ورود رزومه‌ها</h3><button class="ghost" id="addSample">بارگذاری داده نمونه</button></div>
-+      <p class="muted">پشتیبانی نمایشی از PDF/Word و ورود دستی متن. (در حالت آفلاین، تحلیل با منطق داخلی انجام می‌شود)</p>
-+      <div class="grid g2">
-+        <div><label>بارگذاری فایل رزومه (PDF/DOCX)</label><input id="resumeFile" type="file" multiple accept=".pdf,.doc,.docx,.txt"/></div>
-+        <div><label>نام داوطلب</label><input id="candidateName" placeholder="نام فرد"/></div>
-+        <div style="grid-column:1/-1"><label>متن رزومه (ورود دستی)</label><textarea id="resumeText" placeholder="سوابق شغلی، تحصیلات، مهارت‌ها، دستاوردها..."></textarea></div>
-+      </div>
-+      <div class="row"><button id="addResume">افزودن رزومه به لیست</button></div>
-+      <div id="resumeList" class="muted"></div>
-+    </div>
-+
-+    <div class="card">
-+      <button id="settingsToggle" class="ghost">تنظیمات سامانه</button>
-+      <div id="settingsPanel" class="hidden">
-+        <div class="tabs row" style="margin-top:10px">
-+          <button data-tab="ai" class="active">هوش مصنوعی</button>
-+          <button data-tab="proc">پردازش رزومه</button>
-+          <button data-tab="theme">ظاهر سامانه</button>
-+        </div>
-+        <div id="tab-ai" class="card" style="margin-top:10px">
-+          <label>نوع پردازش</label>
-+          <select id="aiMode"><option value="internal">پردازش داخلی (بدون API)</option><option value="genai">پردازش با هوش مصنوعی مولد (Gemini API)</option></select>
-+          <label style="margin-top:8px">API Key</label>
-+          <div class="row"><input type="password" id="apiKey" placeholder="کلید API"/><button id="toggleKey" class="ghost">نمایش/مخفی</button></div>
-+          <div class="row"><button id="testApi">تست اتصال</button><button id="clearApi" class="ghost">حذف کلید</button></div>
-+          <p id="apiStatus" class="muted">وضعیت اتصال: استفاده از پردازش داخلی</p>
-+          <div id="apiTestResult" class="badge mid" style="display:inline-block;margin-top:8px">نتیجه تست API: هنوز تستی انجام نشده است</div>
-+        </div>
-+        <div id="tab-proc" class="card hidden" style="margin-top:10px">
-+          <label>سطح تحلیل</label><select id="analysisLevel"><option>ساده</option><option selected>متوسط</option><option>پیشرفته</option></select>
-+          <label style="margin-top:8px">زبان تحلیل</label><select id="analysisLang"><option selected>فارسی</option><option>انگلیسی</option><option>خودکار</option></select>
-+        </div>
-+        <div id="tab-theme" class="card hidden" style="margin-top:10px">
-+          <label>رنگ اصلی</label><input id="primaryColor" type="color" value="#1f6feb"/>
-+          <label style="margin-top:8px">حالت نمایش</label><select id="themeMode"><option value="light">روز</option><option value="dark">شب</option><option value="auto" selected>خودکار</option></select>
-+        </div>
-+      </div>
-+    </div>
-+
-+    <div class="card">
-+      <button id="runAnalysis">شروع تحلیل و تولید داشبورد</button>
-+    </div>
-+  </div>
-+
-+  <div id="dashboardPage">
-+    <div class="card row" style="align-items:center">
-+      <h2 style="margin:0">داشبورد نتایج نهایی</h2>
-+      <button id="backBtn" class="ghost">بازگشت به فرم</button>
-+      <button id="exportTxt" class="ghost">خروجی متنی</button>
-+      <button id="printPdf">چاپ / PDF</button>
-+    </div>
-+    <div class="grid g3" id="kpis"></div>
-+    <div class="card" id="jobInfo"></div>
-+    <div class="card table"><h3>رتبه‌بندی و مقایسه داوطلبان</h3><div id="rankTable"></div></div>
-+    <div class="card" id="insights"></div>
-+  </div>
-+</div>
-+
-+<script>
-+const state={resumes:[],apiConnected:false};
-+const byId=(id)=>document.getElementById(id);
-+const tokenize=t=>new Set((t||'').toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,' ').split(/\s+/).filter(Boolean));
-+
-+function setTheme(){
-+  const mode=byId('themeMode').value;document.body.classList.toggle('dark',mode==='dark'||(mode==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches));
-+  document.documentElement.style.setProperty('--primary',byId('primaryColor').value);
-+}
-+
-+function parseResume(text,name){
-+  const lower=(text||'').toLowerCase();
-+  const yearsMatch=[...lower.matchAll(/(\d+)\s*(سال|year)/g)];
-+  const years=yearsMatch.length?Math.max(...yearsMatch.map(m=>+m[1])):Math.floor(Math.random()*8)+2;
-+  const skills=['sales','crm','excel','power bi','negotiation','leadership','marketing','python','sql','تحلیل بازار','مذاکره','مدیریت تیم','گزارش دهی'];
-+  const found=skills.filter(s=>lower.includes(s));
-+  const edu=/(کارشناسی|ارشد|دکتری|bachelor|master|phd)/.test(lower);
-+  return {name:name||`داوطلب ${state.resumes.length+1}`,text,years,foundSkills:found,education:edu};
-+}
-+
-+function analyze(){
-+  const jobTitle=byId('jobTitle').value.trim();
-+  const jobDesc=byId('jobDesc').value.trim();
-+  const comps=byId('competencies').value.split(',').map(s=>s.trim()).filter(Boolean);
-+  const missing=[]; if(!jobTitle)missing.push('عنوان شغل'); if(!jobDesc)missing.push('شرح شغل'); if(!state.resumes.length)missing.push('حداقل یک رزومه');
-+  const jdTokens=tokenize(jobTitle+' '+jobDesc+' '+comps.join(' '));
-+
-+  const results=state.resumes.map(r=>{
-+    const rt=tokenize(r.text); let overlap=0; jdTokens.forEach(t=>{if(rt.has(t))overlap++;});
-+    const match=Math.min(100,Math.round((overlap/Math.max(jdTokens.size,1))*60 + Math.min(r.years,12)*2.5 + r.foundSkills.length*3 + (r.education?5:0)));
-+    const level=match>=75?'بالا':match>=50?'متوسط':'پایین';
-+    const risk=match>=75?'کم':match>=50?'متوسط':'بالا';
-+    const interview=match>=75?'اولویت بالا':match>=50?'اولویت متوسط':'اولویت پایین';
-+    const strengths=[r.years>=5?'تجربه عملی مناسب':'',r.foundSkills.length>=3?'پوشش مهارتی خوب':'',r.education?'تحصیلات مرتبط':''].filter(Boolean);
-+    const gaps=[r.years<4?'نیاز به تجربه بیشتر':'',r.foundSkills.length<2?'شواهد مهارتی محدود':'',overlap<5?'انطباق متنی پایین با JD':''].filter(Boolean);
-+    const questions=[`نمونه‌ای از دستاورد شما در نقش ${jobTitle} چیست؟`,`چگونه KPIهای این شغل را مدیریت می‌کنید؟`,gaps[0]?`برای رفع ${gaps[0]} چه برنامه‌ای دارید؟`:'مهم‌ترین چالش حرفه‌ای شما چه بوده است؟'];
-+    return {...r,match,level,risk,interview,strengths,gaps,questions};
-+  }).sort((a,b)=>b.match-a.match);
-+
-+  renderDashboard({missing,jobTitle,jobDesc,comps,results});
-+}
-+
-+function renderDashboard({missing,jobTitle,jobDesc,comps,results}){
-+  byId('inputPage').style.display='none'; byId('dashboardPage').style.display='block';
-+  const avg=Math.round(results.reduce((s,r)=>s+r.match,0)/Math.max(results.length,1));
-+  byId('kpis').innerHTML=`
-+    <div class='kpi'><div class='muted'>تعداد رزومه بررسی‌شده</div><h3>${results.length}</h3></div>
-+    <div class='kpi'><div class='muted'>میانگین انطباق</div><h3>${avg}/100</h3><div class='progress'><div style='width:${avg}%'></div></div></div>
-+    <div class='kpi'><div class='muted'>وضعیت پردازش</div><h3>${state.apiConnected?'AI فعال':'منطق داخلی'}</h3></div>`;
-+  byId('jobInfo').innerHTML=`<h3>مشخصات شغل و معیارهای ارزیابی</h3><p><b>عنوان شغل:</b> ${jobTitle||'نامشخص'}</p><p><b>معیارها:</b> ${comps.join(' | ')||'ثبت نشده'}</p><p><b>شرح:</b> ${jobDesc||'ثبت نشده'}</p>${missing.length?`<p class='badge low'>کمبود اطلاعات ورودی: ${missing.join('، ')}</p>`:''}`;
-+
-+  byId('rankTable').innerHTML=`<table><thead><tr><th>رتبه</th><th>نام</th><th>امتیاز نهایی</th><th>سطح</th><th>ریسک استخدام</th><th>اولویت مصاحبه</th></tr></thead><tbody>${results.map((r,i)=>`<tr><td>${i+1}</td><td>${r.name}</td><td>${r.match}</td><td><span class='badge ${r.level==='بالا'?'good':r.level==='متوسط'?'mid':'low'}'>${r.level}</span></td><td>${r.risk}</td><td>${r.interview}</td></tr>`).join('')}</tbody></table>`;
-+
-+  byId('insights').innerHTML='<h3>تحلیل تفصیلی داوطلبان</h3>'+results.map(r=>`<div class='card'><b>${r.name}</b> - امتیاز ${r.match}/100
-+    <p><b>نقاط قوت:</b> ${r.strengths.join('، ')||'داده کافی نیست'}</p>
-+    <p><b>نقاط ضعف:</b> ${r.gaps.join('، ')||'مورد بحرانی مشاهده نشد'}</p>
-+    <p><b>سوالات پیشنهادی مصاحبه:</b> ${r.questions.join(' | ')}</p>
-+    <p><b>پیشنهاد نهایی:</b> ${r.match>=75?'دعوت به مصاحبه تخصصی و بررسی مرجع':r.match>=50?'دعوت مشروط به ارزیابی تکمیلی': 'عدم اولویت در این مرحله'}</p></div>`).join('');
-+}
-+
-+byId('addResume').onclick=()=>{const t=byId('resumeText').value.trim();const n=byId('candidateName').value.trim();if(!t)return alert('متن رزومه را وارد کنید.');state.resumes.push(parseResume(t,n));byId('resumeList').innerHTML=state.resumes.map((r,i)=>`${i+1}) ${r.name}`).join('<br>');byId('resumeText').value='';byId('candidateName').value='';};
-+byId('addSample').onclick=()=>{const s=[['علی رضایی','8 سال تجربه فروش B2B، مدیریت تیم 12 نفره، CRM، مذاکره، تحلیل بازار، گزارش دهی هفتگی، کارشناسی مدیریت'],['مریم اکبری','4 سال سابقه فروش سازمانی، ارتباط با مشتری کلیدی، excel، power bi، تحقق 120٪ تارگت، کارشناسی ارشد'],['رضا صادقی','2 سال کارشناس فروش، پیگیری لید، مذاکره پایه، گزارش روزانه']];s.forEach(x=>state.resumes.push(parseResume(x[1],x[0])));byId('resumeList').innerHTML=state.resumes.map((r,i)=>`${i+1}) ${r.name}`).join('<br>');};
-+byId('runAnalysis').onclick=analyze;
-+byId('backBtn').onclick=()=>{byId('dashboardPage').style.display='none';byId('inputPage').style.display='block';};
-+byId('settingsToggle').onclick=()=>byId('settingsPanel').classList.toggle('hidden');
-+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active');['ai','proc','theme'].forEach(t=>byId('tab-'+t).classList.add('hidden'));byId('tab-'+b.dataset.tab).classList.remove('hidden');});
-+byId('toggleKey').onclick=()=>{const k=byId('apiKey');k.type=k.type==='password'?'text':'password'};
-+byId('testApi').onclick=()=>{
-+  const mode=byId('aiMode').value;
-+  const key=byId('apiKey').value.trim();
-+  const ok=mode==='genai'&&key.length>15;
-+  const now=new Date().toLocaleString('fa-IR');
-+  state.apiConnected=ok;
-+  byId('apiStatus').textContent='وضعیت اتصال: '+(ok?'موفق (نمادین)':'ناموفق، بازگشت به پردازش داخلی');
-+  const el=byId('apiTestResult');
-+  el.className='badge '+(ok?'good':'low');
-+  el.textContent='نتیجه تست API: '+(ok?'✅ اتصال موفق (نمایشی)':'❌ اتصال ناموفق')+' | زمان: '+now;
-+};
-+byId('clearApi').onclick=()=>{
-+  byId('apiKey').value='';
-+  state.apiConnected=false;
-+  byId('apiStatus').textContent='وضعیت اتصال: کلید حذف شد';
-+  const el=byId('apiTestResult');
-+  el.className='badge mid';
-+  el.textContent='نتیجه تست API: کلید حذف شد؛ لطفاً تست جدید بگیرید.';
-+};
-+byId('themeMode').onchange=setTheme;byId('primaryColor').oninput=setTheme;setTheme();
-+byId('exportTxt').onclick=()=>{const text=[...document.querySelectorAll('#dashboardPage h2,#dashboardPage h3,#dashboardPage p, #dashboardPage td, #dashboardPage th')].map(e=>e.innerText).join('\n');const blob=new Blob([text],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='HR-Report.txt';a.click();};
-+byId('printPdf').onclick=()=>window.print();
-+</script>
-+</body>
-+</html>
- 
-EOF
-)
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>سامانه ارزیابی رزومه ها جهت استخدام</title>
+  <style>
+    :root {--primary:#1f6feb;--bg:#f6f8fb;--card:#fff;--text:#1f2937;--muted:#6b7280;--ok:#059669;--warn:#d97706;--bad:#dc2626;--border:#e5e7eb;}
+    body.dark{--bg:#0b1220;--card:#121a2b;--text:#e5e7eb;--muted:#9ca3af;--border:#22304a}
+    *{box-sizing:border-box;font-family:Vazirmatn,Tahoma,sans-serif}
+    body{margin:0;background:var(--bg);color:var(--text)}
+    .container{max-width:1200px;margin:auto;padding:16px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px}
+    h1,h2,h3{margin:0 0 10px}
+    .muted{color:var(--muted);font-size:.9rem}
+    .grid{display:grid;gap:12px}
+    .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    label{font-size:.86rem;font-weight:600;margin-bottom:4px;display:block}
+    input,select,textarea,button{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text)}
+    textarea{min-height:90px;resize:vertical}
+    button{cursor:pointer;background:var(--primary);color:#fff;border:none;font-weight:700}
+    button.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+    .row{display:flex;gap:8px;flex-wrap:wrap}
+    .row > *{flex:1}
+    .tabs button{background:transparent;border:1px solid var(--border);color:var(--text)}
+    .tabs button.active{background:var(--primary);color:#fff}
+    .hidden{display:none}
+    .badge{padding:5px 10px;border-radius:999px;font-size:.8rem;font-weight:700}
+    .good{background:#dcfce7;color:#166534}.mid{background:#fef3c7;color:#92400e}.low{background:#fee2e2;color:#991b1b}
+    .table{overflow:auto}
+    table{width:100%;border-collapse:collapse;font-size:.9rem}
+    th,td{border-bottom:1px solid var(--border);padding:8px;text-align:right;white-space:nowrap}
+    .kpi{padding:10px;border:1px solid var(--border);border-radius:12px}
+    .progress{height:9px;background:var(--border);border-radius:999px;overflow:hidden}
+    .progress > div{height:100%;background:var(--primary)}
+    #dashboardPage{display:none}
+    @media(max-width:900px){.g2,.g3{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="container">
+  <div id="inputPage">
+    <div class="card">
+      <h1>سامانه ارزیابی رزومه ها جهت استخدام</h1>
+      <p class="muted">ورود اطلاعات اولیه، تحلیل انطباق رزومه‌ها و تولید داشبورد تصمیم‌گیری استخدام.</p>
+    </div>
+
+    <div class="card grid g2">
+      <div><label>نام شرکت / سازمان</label><input id="companyName" placeholder="مثال: شرکت توسعه بازار نوین"/></div>
+      <div><label>نوع کسب‌وکار / صنعت</label><input id="industry" placeholder="مثال: فناوری اطلاعات"/></div>
+      <div><label>عنوان شغل</label><input id="jobTitle" placeholder="مثال: مدیر فروش"/></div>
+      <div><label>سطح سازمانی</label><select id="orgLevel"><option>کارشناس</option><option>ارشد</option><option selected>مدیر</option><option>سرپرست</option></select></div>
+      <div><label>مدیر پاسخگو</label><input id="reportTo" placeholder="مثال: مدیرعامل"/></div>
+      <div><label>موقعیت جغرافیایی</label><input id="location" placeholder="مثال: تهران"/></div>
+      <div class="" style="grid-column:1/-1"><label>شرح شغل</label><textarea id="jobDesc" placeholder="شرح دقیق مسئولیت‌ها، مهارت‌های ضروری، اهداف نقش..."></textarea></div>
+      <div style="grid-column:1/-1"><label>معیارهای کلیدی شایستگی (با ویرگول جدا کنید)</label><input id="competencies" value="تجربه مرتبط, مدیریت تیم, مذاکره, تحلیل بازار, ارتباط با مشتری, گزارش‌دهی"/></div>
+    </div>
+
+    <div class="card">
+      <div class="row" style="align-items:center"><h3 style="margin:0">ورود رزومه‌ها</h3><button class="ghost" id="addSample">بارگذاری داده نمونه</button></div>
+      <p class="muted">پشتیبانی نمایشی از PDF/Word و ورود دستی متن. (در حالت آفلاین، تحلیل با منطق داخلی انجام می‌شود)</p>
+      <div class="grid g2">
+        <div><label>بارگذاری فایل رزومه (PDF/DOCX)</label><input id="resumeFile" type="file" multiple accept=".pdf,.doc,.docx,.txt"/></div>
+        <div><label>نام داوطلب</label><input id="candidateName" placeholder="نام فرد"/></div>
+        <div style="grid-column:1/-1"><label>متن رزومه (ورود دستی)</label><textarea id="resumeText" placeholder="سوابق شغلی، تحصیلات، مهارت‌ها، دستاوردها..."></textarea></div>
+      </div>
+      <div class="row"><button id="addResume">افزودن رزومه به لیست</button></div>
+      <div id="resumeList" class="muted"></div>
+    </div>
+
+    <div class="card">
+      <button id="settingsToggle" class="ghost">تنظیمات سامانه</button>
+      <div id="settingsPanel" class="hidden">
+        <div class="tabs row" style="margin-top:10px">
+          <button data-tab="ai" class="active">هوش مصنوعی</button>
+          <button data-tab="proc">پردازش رزومه</button>
+          <button data-tab="theme">ظاهر سامانه</button>
+        </div>
+        <div id="tab-ai" class="card" style="margin-top:10px">
+          <label>نوع پردازش</label>
+          <select id="aiMode"><option value="internal">پردازش داخلی (بدون API)</option><option value="genai">پردازش با هوش مصنوعی مولد (Gemini API)</option></select>
+          <label style="margin-top:8px">API Key</label>
+          <div class="row"><input type="password" id="apiKey" placeholder="کلید API"/><button id="toggleKey" class="ghost">نمایش/مخفی</button></div>
+          <div class="row"><button id="testApi">تست اتصال</button><button id="clearApi" class="ghost">حذف کلید</button></div>
+          <p id="apiStatus" class="muted">وضعیت اتصال: استفاده از پردازش داخلی</p>
+          <div id="apiTestResult" class="badge mid" style="display:inline-block;margin-top:8px">نتیجه تست API: هنوز تستی انجام نشده است</div>
+        </div>
+        <div id="tab-proc" class="card hidden" style="margin-top:10px">
+          <label>سطح تحلیل</label><select id="analysisLevel"><option>ساده</option><option selected>متوسط</option><option>پیشرفته</option></select>
+          <label style="margin-top:8px">زبان تحلیل</label><select id="analysisLang"><option selected>فارسی</option><option>انگلیسی</option><option>خودکار</option></select>
+        </div>
+        <div id="tab-theme" class="card hidden" style="margin-top:10px">
+          <label>رنگ اصلی</label><input id="primaryColor" type="color" value="#1f6feb"/>
+          <label style="margin-top:8px">حالت نمایش</label><select id="themeMode"><option value="light">روز</option><option value="dark">شب</option><option value="auto" selected>خودکار</option></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <button id="runAnalysis">شروع تحلیل و تولید داشبورد</button>
+    </div>
+  </div>
+
+  <div id="dashboardPage">
+    <div class="card row" style="align-items:center">
+      <h2 style="margin:0">داشبورد نتایج نهایی</h2>
+      <button id="backBtn" class="ghost">بازگشت به فرم</button>
+      <button id="exportTxt" class="ghost">خروجی متنی</button>
+      <button id="printPdf">چاپ / PDF</button>
+    </div>
+    <div class="grid g3" id="kpis"></div>
+    <div class="card" id="jobInfo"></div>
+    <div class="card table"><h3>رتبه‌بندی و مقایسه داوطلبان</h3><div id="rankTable"></div></div>
+    <div class="card" id="insights"></div>
+  </div>
+</div>
+
+<script>
+const state={resumes:[],apiConnected:false};
+const byId=(id)=>document.getElementById(id);
+const tokenize=t=>new Set((t||'').toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,' ').split(/\s+/).filter(Boolean));
+
+function setTheme(){
+  const mode=byId('themeMode').value;document.body.classList.toggle('dark',mode==='dark'||(mode==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches));
+  document.documentElement.style.setProperty('--primary',byId('primaryColor').value);
+}
+
+function parseResume(text,name){
+  const lower=(text||'').toLowerCase();
+  const yearsMatch=[...lower.matchAll(/(\d+)\s*(سال|year)/g)];
+  const years=yearsMatch.length?Math.max(...yearsMatch.map(m=>+m[1])):Math.floor(Math.random()*8)+2;
+  const skills=['sales','crm','excel','power bi','negotiation','leadership','marketing','python','sql','تحلیل بازار','مذاکره','مدیریت تیم','گزارش دهی'];
+  const found=skills.filter(s=>lower.includes(s));
+  const edu=/(کارشناسی|ارشد|دکتری|bachelor|master|phd)/.test(lower);
+  return {name:name||`داوطلب ${state.resumes.length+1}`,text,years,foundSkills:found,education:edu};
+}
+
+function analyze(){
+  const jobTitle=byId('jobTitle').value.trim();
+  const jobDesc=byId('jobDesc').value.trim();
+  const comps=byId('competencies').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const missing=[]; if(!jobTitle)missing.push('عنوان شغل'); if(!jobDesc)missing.push('شرح شغل'); if(!state.resumes.length)missing.push('حداقل یک رزومه');
+  const jdTokens=tokenize(jobTitle+' '+jobDesc+' '+comps.join(' '));
+
+  const results=state.resumes.map(r=>{
+    const rt=tokenize(r.text); let overlap=0; jdTokens.forEach(t=>{if(rt.has(t))overlap++;});
+    const match=Math.min(100,Math.round((overlap/Math.max(jdTokens.size,1))*60 + Math.min(r.years,12)*2.5 + r.foundSkills.length*3 + (r.education?5:0)));
+    const level=match>=75?'بالا':match>=50?'متوسط':'پایین';
+    const risk=match>=75?'کم':match>=50?'متوسط':'بالا';
+    const interview=match>=75?'اولویت بالا':match>=50?'اولویت متوسط':'اولویت پایین';
+    const strengths=[r.years>=5?'تجربه عملی مناسب':'',r.foundSkills.length>=3?'پوشش مهارتی خوب':'',r.education?'تحصیلات مرتبط':''].filter(Boolean);
+    const gaps=[r.years<4?'نیاز به تجربه بیشتر':'',r.foundSkills.length<2?'شواهد مهارتی محدود':'',overlap<5?'انطباق متنی پایین با JD':''].filter(Boolean);
+    const questions=[`نمونه‌ای از دستاورد شما در نقش ${jobTitle} چیست؟`,`چگونه KPIهای این شغل را مدیریت می‌کنید؟`,gaps[0]?`برای رفع ${gaps[0]} چه برنامه‌ای دارید؟`:'مهم‌ترین چالش حرفه‌ای شما چه بوده است؟'];
+    return {...r,match,level,risk,interview,strengths,gaps,questions};
+  }).sort((a,b)=>b.match-a.match);
+
+  renderDashboard({missing,jobTitle,jobDesc,comps,results});
+}
+
+function renderDashboard({missing,jobTitle,jobDesc,comps,results}){
+  byId('inputPage').style.display='none'; byId('dashboardPage').style.display='block';
+  const avg=Math.round(results.reduce((s,r)=>s+r.match,0)/Math.max(results.length,1));
+  byId('kpis').innerHTML=`
+    <div class='kpi'><div class='muted'>تعداد رزومه بررسی‌شده</div><h3>${results.length}</h3></div>
+    <div class='kpi'><div class='muted'>میانگین انطباق</div><h3>${avg}/100</h3><div class='progress'><div style='width:${avg}%'></div></div></div>
+    <div class='kpi'><div class='muted'>وضعیت پردازش</div><h3>${state.apiConnected?'AI فعال':'منطق داخلی'}</h3></div>`;
+  byId('jobInfo').innerHTML=`<h3>مشخصات شغل و معیارهای ارزیابی</h3><p><b>عنوان شغل:</b> ${jobTitle||'نامشخص'}</p><p><b>معیارها:</b> ${comps.join(' | ')||'ثبت نشده'}</p><p><b>شرح:</b> ${jobDesc||'ثبت نشده'}</p>${missing.length?`<p class='badge low'>کمبود اطلاعات ورودی: ${missing.join('، ')}</p>`:''}`;
+
+  byId('rankTable').innerHTML=`<table><thead><tr><th>رتبه</th><th>نام</th><th>امتیاز نهایی</th><th>سطح</th><th>ریسک استخدام</th><th>اولویت مصاحبه</th></tr></thead><tbody>${results.map((r,i)=>`<tr><td>${i+1}</td><td>${r.name}</td><td>${r.match}</td><td><span class='badge ${r.level==='بالا'?'good':r.level==='متوسط'?'mid':'low'}'>${r.level}</span></td><td>${r.risk}</td><td>${r.interview}</td></tr>`).join('')}</tbody></table>`;
+
+  byId('insights').innerHTML='<h3>تحلیل تفصیلی داوطلبان</h3>'+results.map(r=>`<div class='card'><b>${r.name}</b> - امتیاز ${r.match}/100
+    <p><b>نقاط قوت:</b> ${r.strengths.join('، ')||'داده کافی نیست'}</p>
+    <p><b>نقاط ضعف:</b> ${r.gaps.join('، ')||'مورد بحرانی مشاهده نشد'}</p>
+    <p><b>سوالات پیشنهادی مصاحبه:</b> ${r.questions.join(' | ')}</p>
+    <p><b>پیشنهاد نهایی:</b> ${r.match>=75?'دعوت به مصاحبه تخصصی و بررسی مرجع':r.match>=50?'دعوت مشروط به ارزیابی تکمیلی': 'عدم اولویت در این مرحله'}</p></div>`).join('');
+}
+
+byId('addResume').onclick=()=>{const t=byId('resumeText').value.trim();const n=byId('candidateName').value.trim();if(!t)return alert('متن رزومه را وارد کنید.');state.resumes.push(parseResume(t,n));byId('resumeList').innerHTML=state.resumes.map((r,i)=>`${i+1}) ${r.name}`).join('<br>');byId('resumeText').value='';byId('candidateName').value='';};
+byId('addSample').onclick=()=>{const s=[['علی رضایی','8 سال تجربه فروش B2B، مدیریت تیم 12 نفره، CRM، مذاکره، تحلیل بازار، گزارش دهی هفتگی، کارشناسی مدیریت'],['مریم اکبری','4 سال سابقه فروش سازمانی، ارتباط با مشتری کلیدی، excel، power bi، تحقق 120٪ تارگت، کارشناسی ارشد'],['رضا صادقی','2 سال کارشناس فروش، پیگیری لید، مذاکره پایه، گزارش روزانه']];s.forEach(x=>state.resumes.push(parseResume(x[1],x[0])));byId('resumeList').innerHTML=state.resumes.map((r,i)=>`${i+1}) ${r.name}`).join('<br>');};
+byId('runAnalysis').onclick=analyze;
+byId('backBtn').onclick=()=>{byId('dashboardPage').style.display='none';byId('inputPage').style.display='block';};
+byId('settingsToggle').onclick=()=>byId('settingsPanel').classList.toggle('hidden');
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active');['ai','proc','theme'].forEach(t=>byId('tab-'+t).classList.add('hidden'));byId('tab-'+b.dataset.tab).classList.remove('hidden');});
+byId('toggleKey').onclick=()=>{const k=byId('apiKey');k.type=k.type==='password'?'text':'password'};
+byId('testApi').onclick=()=>{
+  const mode=byId('aiMode').value;
+  const key=byId('apiKey').value.trim();
+  const ok=mode==='genai'&&key.length>15;
+  const now=new Date().toLocaleString('fa-IR');
+  state.apiConnected=ok;
+  byId('apiStatus').textContent='وضعیت اتصال: '+(ok?'موفق (نمادین)':'ناموفق، بازگشت به پردازش داخلی');
+  const el=byId('apiTestResult');
+  el.className='badge '+(ok?'good':'low');
+  el.textContent='نتیجه تست API: '+(ok?'✅ اتصال موفق (نمایشی)':'❌ اتصال ناموفق')+' | زمان: '+now;
+};
+byId('clearApi').onclick=()=>{
+  byId('apiKey').value='';
+  state.apiConnected=false;
+  byId('apiStatus').textContent='وضعیت اتصال: کلید حذف شد';
+  const el=byId('apiTestResult');
+  el.className='badge mid';
+  el.textContent='نتیجه تست API: کلید حذف شد؛ لطفاً تست جدید بگیرید.';
+};
+byId('themeMode').onchange=setTheme;byId('primaryColor').oninput=setTheme;setTheme();
+byId('exportTxt').onclick=()=>{const text=[...document.querySelectorAll('#dashboardPage h2,#dashboardPage h3,#dashboardPage p, #dashboardPage td, #dashboardPage th')].map(e=>e.innerText).join('\n');const blob=new Blob([text],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='HR-Report.txt';a.click();};
+byId('printPdf').onclick=()=>window.print();
+</script>
+</body>
+</html>

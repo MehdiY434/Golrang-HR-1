@@ -180,3 +180,21 @@ head -n 5 CVJDHR.html
 6. commit می‌زند.
 7. branch را push می‌کند.
 8. لینک ساخت PR را در GitHub قابل استفاده می‌کند.
+
+## ایجاد/به‌هنگام‌سازی فایل PR (متن آماده PR)
+اگر می‌خواهید یک فایل استاندارد برای توضیحات Pull Request بسازید یا آپدیت کنید:
+
+```bash
+./create-or-update-pr-file.sh [PR_FILE] [TITLE] [SCOPE]
+```
+
+نمونه:
+
+```bash
+./create-or-update-pr-file.sh PR_MESSAGE.md "feat: improve resume analysis" "HR Dashboard"
+```
+
+خروجی این اسکریپت:
+1. یک فایل Markdown برای PR می‌سازد یا همان فایل را به‌روزرسانی می‌کند.
+2. بخش‌های استاندارد `Motivation`، `Description` و `Testing` را قرار می‌دهد.
+3. زمان به‌روزرسانی (UTC) و Scope را در فایل ثبت می‌کند.

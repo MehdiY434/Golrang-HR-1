@@ -144,12 +144,16 @@ head -n 5 CVJDHR.html
 برای اینکه همیشه بتوانید **Create PR** را دوباره فعال کنید، اسکریپت زیر اضافه شده است:
 
 ```bash
-./recreate-pr.sh feature/recreate-pr-YYYYMMDD
+./recreate-pr.sh feature/recreate-pr-YYYYMMDD main
 ```
 
+> اگر آرگومان دوم را ندهید، اسکریپت از branch فعلی به‌عنوان base استفاده می‌کند.
+
 این اسکریپت به‌ترتیب:
-1. یک branch جدید می‌سازد.
-2. یک فایل marker جدید ایجاد می‌کند تا حتماً diff جدید داشته باشید.
-3. commit می‌زند.
-4. branch را push می‌کند.
-5. شما می‌توانید در GitHub روی **Compare & pull request** بزنید.
+1. آخرین وضعیت remote را fetch می‌کند.
+2. روی branch مبنا checkout می‌کند.
+3. branch مبنا را با `pull --ff-only` به‌روز می‌کند.
+4. یک branch جدید می‌سازد.
+5. یک فایل marker جدید ایجاد می‌کند تا حتماً diff جدید داشته باشید.
+6. commit می‌زند.
+7. branch را push می‌کند و PR را قابل ایجاد می‌کند.

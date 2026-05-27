@@ -157,3 +157,26 @@ head -n 5 CVJDHR.html
 5. یک فایل marker جدید ایجاد می‌کند تا حتماً diff جدید داشته باشید.
 6. commit می‌زند.
 7. branch را push می‌کند و PR را قابل ایجاد می‌کند.
+
+## آپدیت کدها + ایجاد PR جدید (خودکار)
+برای سناریویی که می‌خواهید یک PR جدید با تغییر تضمینی ساخته شود، از اسکریپت زیر استفاده کنید:
+
+```bash
+./update-and-create-pr.sh <new-branch-name> [base-branch] [commit-message]
+```
+
+نمونه:
+
+```bash
+./update-and-create-pr.sh feature/new-pr-flow main "chore: update code and open new PR"
+```
+
+این اسکریپت:
+1. `origin` را fetch می‌کند.
+2. روی branch مبنا checkout می‌کند.
+3. branch مبنا را `pull --ff-only` می‌کند.
+4. branch جدید می‌سازد.
+5. یک marker جدید ثبت می‌کند تا حتماً diff برای PR وجود داشته باشد.
+6. commit می‌زند.
+7. branch را push می‌کند.
+8. لینک ساخت PR را در GitHub قابل استفاده می‌کند.
